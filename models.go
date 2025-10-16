@@ -5,12 +5,21 @@ import (
 )
 
 // ReviewItem represents a single issue or suggestion
+
+type Severity string
+
+const (
+	SeverityHigh   Severity = "High"
+	SeverityMedium Severity = "Medium"
+	SeverityLow    Severity = "Low"
+)
+
 type ReviewItem struct {
 	number     int
 	title      string
 	content    string
 	codeBlocks []string
-	severity   string
+	severity   Severity
 	checked    bool
 }
 

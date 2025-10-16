@@ -67,7 +67,12 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				}
 			case " ", "x":
 				if len(m.items) > 0 && m.cursorPos < len(m.items) {
-					m.items[m.cursorPos].checked = !m.items[m.cursorPos].checked
+					// check if the position is already checked
+					if m.items[m.cursorPos].checked {
+						m.items[m.cursorPos].checked = true
+					} else {
+						m.items[m.cursorPos].checked = false
+					}
 				}
 			case "a":
 				for i := range m.items {
@@ -131,7 +136,7 @@ func (m model) View() string {
 	}
 
 	if m.err != nil {
-		s.WriteString(errorStyle.Render("❌ Error"))
+		s.WriteString(errorStyle.Render("Error"))
 		s.WriteString("\n")
 		s.WriteString(contentStyle.Render(m.err.Error()))
 		s.WriteString("\n\n")
@@ -140,7 +145,7 @@ func (m model) View() string {
 	}
 
 	// Success header
-	s.WriteString(successStyle.Render("✅ Review Complete"))
+	s.WriteString(successStyle.Render("Review Complete"))
 	s.WriteString("\n")
 	s.WriteString(separatorStyle.Render(strings.Repeat("─", maxWidth)))
 	s.WriteString("\n")
@@ -178,12 +183,12 @@ func (m model) View() string {
 			// Severity badge
 			var severityBadge string
 			switch item.severity {
-			case "High":
-				severityBadge = severityHighStyle.Render(" ⚠ HIGH ")
-			case "Medium":
-				severityBadge = severityMediumStyle.Render(" ● MED ")
-			case "Low":
-				severityBadge = severityLowStyle.Render(" ○ LOW ")
+			case SeverityHigh:
+				severityBadge = severityHighStyle.Render(" HIGH ")
+			case SeverityMedium:
+				severityBadge = severityMediumStyle.Render(" MED ")
+			case SeverityLow:
+				severityBadge = severityLowStyle.Render(" LOW ")
 			}
 
 			// Item header with number, checkbox, and severity

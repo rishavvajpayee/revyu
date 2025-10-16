@@ -14,18 +14,18 @@ var buildTimeAPIKey string
 func main() {
 	apiKey := buildTimeAPIKey
 
-	if apiKey == "" {
+	if checkEmpty(apiKey) {
 		apiKey = os.Getenv("OPENAI_API_KEY")
 	}
 
-	if apiKey == "" {
+	if checkEmpty(apiKey) {
 		err := godotenv.Load()
 		if err == nil {
 			apiKey = os.Getenv("OPENAI_API_KEY")
 		}
 	}
 
-	if apiKey == "" {
+	if checkEmpty(apiKey) {
 		fmt.Println(errorStyle.Render("❌ Error: OPENAI_API_KEY not found"))
 		fmt.Println(contentStyle.Render("Please either:"))
 		fmt.Println(contentStyle.Render("  1. Set OPENAI_API_KEY environment variable"))
@@ -35,7 +35,7 @@ func main() {
 	}
 
 	if len(os.Args) < 2 {
-		fmt.Println(titleStyle.Render("🔍 Revyu - AI-Powered Code Review TESTING"))
+		fmt.Println(titleStyle.Render("Revyu - AI-Powered Code Review TESTING"))
 		fmt.Println()
 		fmt.Println(subtitleStyle.Render("Usage:"))
 		fmt.Println(contentStyle.Render("  revyu <filename>  - Review git diff for a specific file"))
@@ -47,12 +47,12 @@ func main() {
 
 	diff, err := getGitDiff(filePath)
 	if err != nil {
-		fmt.Println(errorStyle.Render("❌ Error getting git diff"))
+		fmt.Println(errorStyle.Render("Error getting git diff"))
 		fmt.Println(contentStyle.Render(err.Error()))
 		os.Exit(1)
 	}
 
-	if strings.TrimSpace(diff) == "" {
+	if checkEmpty(strings.TrimSpace(diff)) {
 		fmt.Println(subtitleStyle.Render("No changes detected in git diff"))
 		os.Exit(0)
 	}
