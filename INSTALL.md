@@ -12,13 +12,21 @@ This guide covers installation on macOS, Linux, and Windows.
 
 ### Option 1: Using Make (Recommended for macOS/Linux)
 
+> ⚠️ **API Key Setup Required**: Before building, you must either:
+> 1. Create a `.env` file with your OpenAI API key (recommended - embeds key in binary)
+> 2. OR skip the `.env` file and set `OPENAI_API_KEY` environment variable each time you use Revyu
+
 ```bash
 # Clone the repository
 git clone https://github.com/yourusername/revyu.git
 cd revyu
 
-# Create .env file with your API key (optional but recommended)
-echo "OPENAI_API_KEY=your-api-key-here" > .env
+# Create .env file from example
+cp .env.example .env
+# Edit .env and replace with your actual API key
+
+# Or create directly:
+# echo "OPENAI_API_KEY=your-api-key-here" > .env
 
 # Build and install
 make install
@@ -124,15 +132,27 @@ copy revyu.exe %USERPROFILE%\bin\
 
 ### API Key Setup
 
-You have three options for providing your OpenAI API key:
+⚠️ **You MUST provide your OpenAI API key using one of these methods:**
 
-#### 1. Build-time Embedding (Most Secure)
-Create a `.env` file and build with the API key embedded:
+#### 1. Build-time Embedding (Recommended - Most Convenient)
+Create a `.env` file **before running** `make build` or `make install`:
 
 ```bash
+# Create .env file with your actual API key
 echo "OPENAI_API_KEY=your-api-key-here" > .env
+
+# Now build/install (key will be embedded in binary)
 make build
+# or
+make install
 ```
+
+**Advantages:**
+- Key is embedded in the binary
+- No need to set environment variables later
+- Binary is self-contained and portable
+
+**Note:** Without the `.env` file during build, the binary will be created but you'll need to use Option 2 or 3 below.
 
 #### 2. Environment Variable
 Set the environment variable in your shell:

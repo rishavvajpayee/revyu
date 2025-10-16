@@ -28,14 +28,19 @@ An AI-powered Git diff reviewer that uses OpenAI to provide intelligent code rev
 
 ### Quick Install (Cross-Platform)
 
+> ⚠️ **Important**: Create a `.env` file with your OpenAI API key to embed it in the binary. Without it, you'll need to set the `OPENAI_API_KEY` environment variable every time you use Revyu.
+
 **macOS / Linux:**
 ```bash
 # Clone the repository
 git clone https://github.com/yourusername/revyu.git
 cd revyu
 
-# Create .env file with your API key (optional but recommended)
-echo "OPENAI_API_KEY=sk-your-api-key-here" > .env
+# Create .env file with your API key (REQUIRED for embedded key)
+cp .env.example .env
+# Then edit .env and replace with your actual API key
+# Or create it directly:
+# echo "OPENAI_API_KEY=sk-your-api-key-here" > .env
 
 # Build and install
 make install
@@ -47,7 +52,7 @@ make install
 git clone https://github.com/yourusername/revyu.git
 cd revyu
 
-# Create .env file with your API key
+# Create .env file with your API key (REQUIRED for embedded key)
 "OPENAI_API_KEY=sk-your-api-key-here" | Out-File -FilePath .env -Encoding ASCII
 
 # Build and install
@@ -65,17 +70,23 @@ The Makefile automatically detects your OS and uses appropriate paths and comman
 
 ### Alternative: Build Without Embedded Key
 
-You can also build without embedding the API key and use environment variables instead:
+If you prefer NOT to embed the API key in the binary, you can build without a `.env` file and set the environment variable each time:
 
 ```bash
-# Build
+# Build without .env file
 go build -o revyu
 
-# Set environment variable (varies by platform)
+# Then ALWAYS set this environment variable before using revyu:
 export OPENAI_API_KEY="sk-your-api-key-here"  # macOS/Linux
 # or
 $env:OPENAI_API_KEY="sk-your-api-key-here"    # Windows PowerShell
+
+# Make it permanent by adding to your shell profile:
+# macOS/Linux: Add to ~/.bashrc, ~/.zshrc, or ~/.profile
+# Windows: Use setx or add to PowerShell profile
 ```
+
+**Note:** This method requires setting the environment variable every time you open a new terminal, unless you add it to your shell profile.
 
 ## Usage
 
