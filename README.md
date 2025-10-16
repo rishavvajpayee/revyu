@@ -14,70 +14,67 @@ An AI-powered Git diff reviewer that uses OpenAI to provide intelligent code rev
   - Issue detection (bugs, security concerns)
   - Improvement suggestions
 - 🎯 **Smart Formatting** - Automatically formatted and color-coded output
+- 🌍 **Cross-Platform** - Works on macOS, Linux, and Windows
 
 ## Prerequisites
 
-- Go 1.16 or higher
+- Go 1.19 or higher
 - Git repository
 - OpenAI API key
 
 ## Installation
 
-### Option 1: Build with Embedded API Key (Recommended)
+> 📖 **For detailed platform-specific instructions, see [INSTALL.md](INSTALL.md)**
 
-This creates a self-contained binary with the API key baked in:
+### Quick Install (Cross-Platform)
 
-1. Clone or navigate to the project directory:
+**macOS / Linux:**
 ```bash
-cd /Users/rishavvajpayee/Projects/revyu
+# Clone the repository
+git clone https://github.com/yourusername/revyu.git
+cd revyu
+
+# Create .env file with your API key (optional but recommended)
+echo "OPENAI_API_KEY=sk-your-api-key-here" > .env
+
+# Build and install
+make install
 ```
 
-2. Create a `.env` file with your OpenAI API key:
+**Windows (PowerShell):**
+```powershell
+# Clone the repository
+git clone https://github.com/yourusername/revyu.git
+cd revyu
+
+# Create .env file with your API key
+"OPENAI_API_KEY=sk-your-api-key-here" | Out-File -FilePath .env -Encoding ASCII
+
+# Build and install
+.\build.ps1
+make install
+```
+
+### Platform-Specific Notes
+
+- **macOS**: Automatic code signing applied; installs to `/usr/local/bin`
+- **Linux**: Installs to `/usr/local/bin` (may require sudo)
+- **Windows**: Installs to `%USERPROFILE%\bin` (ensure it's in PATH)
+
+The Makefile automatically detects your OS and uses appropriate paths and commands.
+
+### Alternative: Build Without Embedded Key
+
+You can also build without embedding the API key and use environment variables instead:
+
 ```bash
-cp .env.example .env
-```
-
-3. Edit `.env` and add your OpenAI API key:
-```
-OPENAI_API_KEY=sk-your-actual-api-key-here
-```
-
-4. Build with embedded key and code signing:
-
-**Using Makefile (Recommended):**
-```bash
-make build          # Build and sign the binary
-make install        # Build, sign, and install to /usr/local/bin
-make help          # Show all available commands
-```
-
-**Using build script:**
-```bash
-./build.sh
-```
-
-5. Install globally (if not using `make install`):
-```bash
-sudo cp revyu /usr/local/bin/revyu
-```
-
-### Option 2: Build without Embedded Key
-
-If you prefer to use environment variables:
-
-1. Build normally:
-```bash
+# Build
 go build -o revyu
-```
 
-2. Set environment variable (add to `~/.zshrc` or `~/.bashrc`):
-```bash
-export OPENAI_API_KEY="sk-your-actual-api-key-here"
-```
-
-3. Install globally:
-```bash
-sudo cp revyu /usr/local/bin/revyu
+# Set environment variable (varies by platform)
+export OPENAI_API_KEY="sk-your-api-key-here"  # macOS/Linux
+# or
+$env:OPENAI_API_KEY="sk-your-api-key-here"    # Windows PowerShell
 ```
 
 ## Usage
@@ -97,23 +94,23 @@ sudo cp revyu /usr/local/bin/revyu
 The Makefile provides convenient shortcuts for building, installing, and managing the binary:
 
 ```bash
-make build          # Build and code sign the binary
-make install        # Build and install to /usr/local/bin
-make verify         # Verify the code signature of the local binary
-make verify-installed # Verify the code signature of the installed binary
+make help           # Show all available commands
+make build          # Build the binary (OS-aware)
+make install        # Build and install (OS-aware paths)
+make verify         # Verify code signature (macOS only)
 make clean          # Remove built binaries
-make uninstall      # Remove the installed binary from /usr/local/bin
+make uninstall      # Remove the installed binary
 make rebuild        # Clean and rebuild
 make reinstall      # Clean, rebuild, and reinstall
 make test           # Run tests
-make help           # Show all available commands
 ```
 
-**Note:** The Makefile automatically handles:
-- Loading environment variables from `.env`
-- Building with `CGO_ENABLED=1`
-- Code signing with runtime hardening and timestamp
-- Installing with proper permissions
+**The Makefile automatically:**
+- Detects your operating system (macOS, Linux, or Windows)
+- Uses appropriate install paths for each platform
+- Loads environment variables from `.env`
+- Applies code signing on macOS
+- Handles permissions correctly per platform
 
 ## How It Works
 
