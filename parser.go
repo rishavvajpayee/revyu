@@ -6,7 +6,6 @@ import (
 	"github.com/charmbracelet/lipgloss"
 )
 
-// wrapText wraps text to fit within the specified width
 func wrapText(text string, width int) string {
 	if width <= 0 {
 		width = 80
@@ -32,7 +31,6 @@ func wrapText(text string, width int) string {
 	return result.String()
 }
 
-// formatMarkdown converts markdown to styled terminal output
 func formatMarkdown(markdown string, maxWidth int) string {
 	var result strings.Builder
 	lines := strings.Split(markdown, "\n")
@@ -61,10 +59,8 @@ func formatMarkdown(markdown string, maxWidth int) string {
 	for _, line := range lines {
 		trimmed := strings.TrimSpace(line)
 
-		// Handle code blocks
 		if strings.HasPrefix(trimmed, "```") {
 			if inCodeBlock {
-				// End code block - render it
 				for _, codeLine := range codeLines {
 					result.WriteString("  ")
 					result.WriteString(codeBlockStyle.Render(codeLine))
@@ -74,7 +70,6 @@ func formatMarkdown(markdown string, maxWidth int) string {
 				inCodeBlock = false
 				result.WriteString("\n")
 			} else {
-				// Start code block
 				inCodeBlock = true
 			}
 			continue
@@ -85,22 +80,18 @@ func formatMarkdown(markdown string, maxWidth int) string {
 			continue
 		}
 
-		// Skip separator lines
 		if strings.HasPrefix(trimmed, "---") || strings.HasPrefix(trimmed, "===") {
 			result.WriteString(separatorStyle.Render(strings.Repeat("─", maxWidth)))
 			result.WriteString("\n")
 			continue
 		}
 
-		// Skip empty lines (but preserve some spacing)
 		if trimmed == "" {
 			result.WriteString("\n")
 			continue
 		}
 
-		// Handle numbered section headers (1. Summary, 2. Quality Assessment, etc.)
 		if len(trimmed) > 3 && trimmed[0] >= '1' && trimmed[0] <= '9' && trimmed[1] == '.' && trimmed[2] == ' ' {
-			// Remove ** markers if present
 			text := strings.TrimPrefix(trimmed[3:], "**")
 			text = strings.TrimSuffix(text, "**")
 			text = strings.TrimSuffix(text, ":")
@@ -109,7 +100,6 @@ func formatMarkdown(markdown string, maxWidth int) string {
 			continue
 		}
 
-		// Handle **bold** headers
 		if strings.HasPrefix(trimmed, "**") && strings.HasSuffix(trimmed, "**") {
 			text := strings.Trim(trimmed, "*")
 			text = strings.TrimSuffix(text, ":")
@@ -118,7 +108,6 @@ func formatMarkdown(markdown string, maxWidth int) string {
 			continue
 		}
 
-		// Handle ## headers
 		if strings.HasPrefix(trimmed, "##") {
 			text := strings.TrimPrefix(trimmed, "##")
 			text = strings.TrimSpace(text)
@@ -127,7 +116,6 @@ func formatMarkdown(markdown string, maxWidth int) string {
 			continue
 		}
 
-		// Handle # headers
 		if strings.HasPrefix(trimmed, "#") && !strings.HasPrefix(trimmed, "##") {
 			text := strings.TrimPrefix(trimmed, "#")
 			text = strings.TrimSpace(text)
@@ -136,10 +124,8 @@ func formatMarkdown(markdown string, maxWidth int) string {
 			continue
 		}
 
-		// Handle bullet points
 		if strings.HasPrefix(trimmed, "- ") || strings.HasPrefix(trimmed, "* ") {
 			text := trimmed[2:]
-			// Clean up inline markdown
 			text = cleanInlineMarkdown(text)
 			wrapped := wrapText(text, maxWidth-6)
 			lines := strings.Split(wrapped, "\n")
@@ -154,7 +140,6 @@ func formatMarkdown(markdown string, maxWidth int) string {
 			continue
 		}
 
-		// Handle file references with emoji
 		if strings.Contains(trimmed, "📄") {
 			fileRefStyle := lipgloss.NewStyle().
 				Foreground(lipgloss.Color("#8BE9FD")).
@@ -164,7 +149,6 @@ func formatMarkdown(markdown string, maxWidth int) string {
 			continue
 		}
 
-		// Regular paragraphs
 		text := cleanInlineMarkdown(trimmed)
 		wrapped := wrapText(text, maxWidth-4)
 		lines := strings.Split(wrapped, "\n")
@@ -177,21 +161,16 @@ func formatMarkdown(markdown string, maxWidth int) string {
 	return result.String()
 }
 
-// cleanInlineMarkdown removes or converts inline markdown syntax
 func cleanInlineMarkdown(text string) string {
-	// Remove bold markers but keep the text
 	text = strings.ReplaceAll(text, "**", "")
 	text = strings.ReplaceAll(text, "__", "")
-	// Remove italic markers
 	text = strings.ReplaceAll(text, "*", "")
 	text = strings.ReplaceAll(text, "_", "")
-	// Clean up inline code
 	text = strings.ReplaceAll(text, "`", "")
 
 	return text
 }
 
-// parseReviewIntoItems extracts issues and suggestions from the review
 func parseReviewIntoItems(review string) []ReviewItem {
 	items := []ReviewItem{}
 	lines := strings.Split(review, "\n")
@@ -206,7 +185,6 @@ func parseReviewIntoItems(review string) []ReviewItem {
 	for _, line := range lines {
 		trimmed := strings.TrimSpace(line)
 
-		// Detect sections
 		if strings.Contains(trimmed, "**Issues Found**") || strings.Contains(trimmed, "3. Issues") {
 			inIssuesSection = true
 			inSuggestionsSection = false
@@ -221,12 +199,10 @@ func parseReviewIntoItems(review string) []ReviewItem {
 			continue
 		}
 
-		// Skip non-issue/suggestion sections
 		if !inIssuesSection && !inSuggestionsSection {
 			continue
 		}
 
-		// Detect file references as item titles
 		if strings.Contains(trimmed, "📄") || (strings.Contains(trimmed, ":") && len(trimmed) > 0) {
 			isFileRef := false
 			fileExtensions := []string{".go", ".js", ".ts", ".py", ".java", ".vue", ".jsx", ".tsx"}
@@ -238,11 +214,9 @@ func parseReviewIntoItems(review string) []ReviewItem {
 			}
 
 			if isFileRef {
-				// Save previous item
 				if currentItem != nil {
 					items = append(items, *currentItem)
 				}
-				// Start new item
 				currentItem = &ReviewItem{
 					number:     itemNum,
 					title:      trimmed,
@@ -255,30 +229,25 @@ func parseReviewIntoItems(review string) []ReviewItem {
 			}
 		}
 
-		// Handle code blocks
 		if strings.HasPrefix(trimmed, "```") {
 			if inCodeBlock {
-				// End of code block - save accumulated code
 				if currentItem != nil && len(currentCodeBlock) > 0 {
 					currentItem.codeBlocks = append(currentItem.codeBlocks, strings.Join(currentCodeBlock, "\n"))
 					currentCodeBlock = []string{}
 				}
 				inCodeBlock = false
 			} else {
-				// Start of code block
 				inCodeBlock = true
 				currentCodeBlock = []string{}
 			}
 			continue
 		}
 
-		// Accumulate code block content
 		if inCodeBlock {
 			currentCodeBlock = append(currentCodeBlock, line)
 			continue
 		}
 
-		// Detect severity
 		if currentItem != nil && (strings.Contains(trimmed, "Severity:") || strings.Contains(trimmed, "severity:")) {
 			lower := strings.ToLower(trimmed)
 			if strings.Contains(lower, "critical") || strings.Contains(lower, "high") {
@@ -291,7 +260,6 @@ func parseReviewIntoItems(review string) []ReviewItem {
 			continue
 		}
 
-		// Add content to current item
 		if currentItem != nil && trimmed != "" {
 			if currentItem.content != "" {
 				currentItem.content += " "
@@ -300,7 +268,6 @@ func parseReviewIntoItems(review string) []ReviewItem {
 		}
 	}
 
-	// Add last item
 	if currentItem != nil {
 		items = append(items, *currentItem)
 	}

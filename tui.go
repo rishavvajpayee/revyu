@@ -9,7 +9,6 @@ import (
 	"github.com/charmbracelet/lipgloss"
 )
 
-// initialModel creates the initial state for the TUI
 func initialModel(apiKey, filePath, diff string) model {
 	s := spinner.New()
 	s.Spinner = spinner.Dot
@@ -28,7 +27,6 @@ func initialModel(apiKey, filePath, diff string) model {
 	}
 }
 
-// Init initializes the TUI
 func (m model) Init() tea.Cmd {
 	return tea.Batch(
 		m.spinner.Tick,
@@ -36,7 +34,6 @@ func (m model) Init() tea.Cmd {
 	)
 }
 
-// getReview requests a review from the OpenAI API
 func (m model) getReview() tea.Cmd {
 	return func() tea.Msg {
 		review, err := reviewDiff(m.apiKey, m.diff)
@@ -73,12 +70,10 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 					m.items[m.cursorPos].checked = !m.items[m.cursorPos].checked
 				}
 			case "a":
-				// Mark all as checked
 				for i := range m.items {
 					m.items[i].checked = true
 				}
 			case "n":
-				// Mark all as unchecked
 				for i := range m.items {
 					m.items[i].checked = false
 				}
@@ -118,7 +113,6 @@ func (m model) View() string {
 		maxWidth = 110
 	}
 
-	// Header
 	s.WriteString(titleStyle.Render("🔍 Revyu - AI-Powered Code Review"))
 	s.WriteString("\n")
 

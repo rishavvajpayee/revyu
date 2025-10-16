@@ -9,23 +9,16 @@ import (
 	"github.com/joho/godotenv"
 )
 
-// This variable can be set at build time using -ldflags
 var buildTimeAPIKey string
 
 func main() {
-	// Get OpenAI API key with priority order:
-	// 1. Build-time embedded key
-	// 2. Environment variable
-	// 3. .env file
 	apiKey := buildTimeAPIKey
 
 	if apiKey == "" {
-		// Try environment variable first
 		apiKey = os.Getenv("OPENAI_API_KEY")
 	}
 
 	if apiKey == "" {
-		// Try loading from .env file as fallback
 		err := godotenv.Load()
 		if err == nil {
 			apiKey = os.Getenv("OPENAI_API_KEY")
@@ -41,7 +34,6 @@ func main() {
 		os.Exit(1)
 	}
 
-	// Get file path from command line arguments
 	if len(os.Args) < 2 {
 		fmt.Println(titleStyle.Render("🔍 Revyu - AI-Powered Code Review TESTING"))
 		fmt.Println()
@@ -53,7 +45,6 @@ func main() {
 
 	filePath := os.Args[1]
 
-	// Get git diff
 	diff, err := getGitDiff(filePath)
 	if err != nil {
 		fmt.Println(errorStyle.Render("❌ Error getting git diff"))
@@ -66,7 +57,6 @@ func main() {
 		os.Exit(0)
 	}
 
-	// Run the TUI
 	p := tea.NewProgram(initialModel(apiKey, filePath, diff))
 	if _, err := p.Run(); err != nil {
 		fmt.Println(errorStyle.Render("Error running program: " + err.Error()))
